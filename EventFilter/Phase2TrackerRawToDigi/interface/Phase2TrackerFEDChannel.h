@@ -14,7 +14,7 @@ namespace Phase2Tracker {
   {
     public:
       Phase2TrackerFEDChannel(const uint8_t*const data, const size_t offset,
-                 const uint16_t length): data_(data), offset_(offset), length_(length) {}
+                 const uint16_t length, const uint8_t bitoffset = 0): data_(data), offset_(offset), length_(length), bitoffset_(bitoffset) {}
 
       //gets length from first 2 bytes (assuming normal FED channel)
       Phase2TrackerFEDChannel(const uint8_t*const data, const size_t offset);
@@ -29,6 +29,7 @@ namespace Phase2Tracker {
       const uint8_t* data_;
       size_t offset_;
       uint16_t length_;
+      uint8_t bitoffset_;
   }; // end Phase2TrackerFEDChannel class
 
 } // end of Phase2Tracker namespace
