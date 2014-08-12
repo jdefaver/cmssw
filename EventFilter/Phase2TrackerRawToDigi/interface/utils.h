@@ -26,6 +26,8 @@ namespace Phase2Tracker {
   static const int STRIPS_PER_CBC = 254;
   static const int STRIPS_PADDING = 2;
   static const int TRIGGER_SIZE = 0; 
+  static const int P_CLUSTER_SIZE_BITS = 18;
+  static const int S_CLUSTER_SIZE_BITS = 15;
 
   // definition
 
@@ -193,7 +195,7 @@ namespace Phase2Tracker {
                        };
 
 
-  // get 64 bits word from data with given offset
+  // get 64 bits word from data with given offset : only use if at beginning of 64 bits word 
   inline uint64_t read64(int offset, const uint8_t* buffer)
   {
     return *reinterpret_cast<const uint64_t*>(buffer+offset);
@@ -202,10 +204,26 @@ namespace Phase2Tracker {
   // extract data from a 64 bits word using mask and shift
   inline uint64_t extract64(trackerHeader_m mask,trackerHeader_s shift, uint64_t data)
   {  
-    // cout <<"IN  "<< hex<< " " <<setfill('0') << setw(16) << data  << "\n" ; 
     data = (data & mask) >> shift;
     return data;
   }
+
+  inline uint64_t read_n_at_m(const uint8_t* buffer, int size, int pos_bit)
+  {
+      // 1) determine which 64 bit word to read
+      int iword = pos_bit/64;
+      uint64_t data = read64(iword*8, buffer);
+      // 2) determine if you need to read another
+      int end_bit = pos_bit % 64 + size;
+      if(end_bit < 64) {
+          data >>= 64 - end_bit; 
+      } else {
+          data <<= end_bit - 64;
+          data |=  read64((iword+1)*8, buffer) >> (128-end_bit) ;
+      }
+      data &= (uint64_t)((1LL<<size)-1);
+      return data;
+  } 
 
 } // end of Phase2Tracker namespace
 
