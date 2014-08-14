@@ -138,11 +138,11 @@ namespace Phase2Tracker
                       bitOffset += chanSize;
                   }
                   currCBC = iCBC;
-                  chanSize = 18;
+                  chanSize = P_CLUSTER_SIZE_BITS;
               }
               else 
               {
-                  chanSize += 18;
+                  chanSize += P_CLUSTER_SIZE_BITS;
               }
           }
           for (int i=0; i<num_s; i++)
@@ -158,11 +158,11 @@ namespace Phase2Tracker
                       bitOffset += chanSize;
                   }
                   currCBC = iCBC;
-                  chanSize = 15;
+                  chanSize = S_CLUSTER_SIZE_BITS;
               }
               else 
               {
-                  chanSize += 15;
+                  chanSize += S_CLUSTER_SIZE_BITS;
               }
           }
         }
