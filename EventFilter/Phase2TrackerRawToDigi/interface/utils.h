@@ -151,6 +151,14 @@ namespace Phase2Tracker {
     CBC_ERROR  = 2
   };
 
+  // module types
+  enum MODULE_TYPE
+  {
+      UNUSED = -1,
+      MODULE_2S = 0,
+      MODULE_PS = 1
+  };
+
   //to make enums printable
   std::ostream& operator<<(std::ostream& os, const READ_MODE& value);
   inline std::ostream& operator<<(std::ostream& os, const READ_MODE& value)
