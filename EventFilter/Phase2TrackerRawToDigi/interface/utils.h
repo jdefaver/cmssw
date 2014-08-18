@@ -218,20 +218,21 @@ namespace Phase2Tracker {
 
   inline uint64_t read_n_at_m(const uint8_t* buffer, int size, int pos_bit)
   {
-      // 1) determine which 64 bit word to read
-      int iword = pos_bit/64;
-      uint64_t data = read64(iword*8, buffer);
-      // 2) determine if you need to read another
-      int end_bit = pos_bit % 64 + size;
-      if(end_bit < 64) {
-          data >>= 64 - end_bit; 
-      } else {
-          data <<= end_bit - 64;
-          data |=  read64((iword+1)*8, buffer) >> (128-end_bit) ;
-      }
-      data &= (uint64_t)((1LL<<size)-1);
-      return data;
-  } 
+    // 1) determine which 64 bit word to read
+    int iword = pos_bit/64;
+    uint64_t data = *(uint64_t*)(buffer+(iword*8));
+    data >>= pos_bit % 64;
+
+    // 2) determine if you need to read another
+    int end_bit = pos_bit % 64 + size;
+    if(end_bit > 64) {
+        data |=  *(uint64_t*)(buffer+((iword+1)*8)) << (end_bit - 64);
+    }
+    
+    // 3) mask according to expected size
+    data &= (uint64_t)((1LL<<size)-1);
+    return data;
+  }
 
 } // end of Phase2Tracker namespace
 
