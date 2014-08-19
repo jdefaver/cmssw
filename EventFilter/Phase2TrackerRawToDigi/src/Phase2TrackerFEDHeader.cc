@@ -46,7 +46,7 @@ namespace Phase2Tracker
 
   uint8_t Phase2TrackerFEDHeader::dataFormatVersion() const
   {
-    uint8_t Version = static_cast<uint8_t>(extract64(VERSION_M, VERSION_S, header_first_word_));
+    uint8_t Version = static_cast<uint8_t>(read_n_at_m(trackerHeader_,VERSION_L,VERSION_S));
     if (Version != 1)
     {
       std::ostringstream ss;
@@ -61,7 +61,7 @@ namespace Phase2Tracker
   READ_MODE Phase2TrackerFEDHeader::debugMode() const
   {
     // Read debugMode in Tracker Header
-    uint8_t mode = static_cast<uint8_t>(extract64(HEADER_FORMAT_M, HEADER_FORMAT_S, header_first_word_));
+    uint8_t mode = static_cast<uint8_t>(read_n_at_m(trackerHeader_,HEADER_FORMAT_L,HEADER_FORMAT_S));
     
     switch (mode)
     { // check if it is one of correct modes
@@ -84,7 +84,7 @@ namespace Phase2Tracker
   
   uint8_t Phase2TrackerFEDHeader::eventType() const
   {
-    return static_cast<uint8_t>(extract64(EVENT_TYPE_M, EVENT_TYPE_S, header_first_word_));
+    return static_cast<uint8_t>(read_n_at_m(trackerHeader_,EVENT_TYPE_L,EVENT_TYPE_S));
   }
 
   // decode eventType_. Read: readoutMode, conditionData and dataType
@@ -120,16 +120,24 @@ namespace Phase2Tracker
   
   uint64_t Phase2TrackerFEDHeader::glibStatusCode() const
   {
-    return extract64(GLIB_STATUS_M, GLIB_STATUS_S, header_first_word_);
+    return read_n_at_m(trackerHeader_,GLIB_STATUS_L,GLIB_STATUS_S);
   }
   
   std::vector<bool> Phase2TrackerFEDHeader::frontendStatus() const
   {
-    uint16_t FE_status = static_cast<uint16_t>(extract64(FRONTEND_STAT_M, FRONTEND_STAT_S, header_first_word_));
-    std::vector<bool> status(16,false);
-    for(int i = 0; i < 16; i++)
+    uint8_t   fe_status_0 = (uint8_t)(read_n_at_m(trackerHeader_,8,0));
+    uint64_t  fe_status_1 = *(uint64_t*)(trackerHeader_+8);
+    std::vector<bool> status(72,false);
+    for(int i = 0; i < 72; i++)
     {
-      status[i] = (FE_status>>i)&0x1;
+      if(i<8) 
+      { 
+        status[i] = (fe_status_0>>i)&0x1; 
+      }
+      else
+      {
+        status[i] = (fe_status_1>>(i-8))&0x1;
+      }
     }
     return status;
   }
@@ -138,7 +146,7 @@ namespace Phase2Tracker
   {
     if(debugMode_!=SUMMARY)
     {
-      return static_cast<uint16_t>(extract64(CBC_NUMBER_M, CBC_NUMBER_S, header_second_word_));
+      return static_cast<uint16_t>(read_n_at_m(trackerHeader_,CBC_NUMBER_L,CBC_NUMBER_S));
     }
     else
     {
@@ -146,12 +154,10 @@ namespace Phase2Tracker
     }
   }
   
-  // pending too
   std::vector<uint8_t> Phase2TrackerFEDHeader::CBCStatus() const
   {
-    // set offset and data to begining of second header 64 bit word
-    int offset = 8;
-    uint64_t data64 = header_second_word_; 
+    // set offset and data to begining 
+    int offset_bits = 128;
     // number of CBC:
     uint16_t cbc_num = numberOfCBC();
     // size of data per CBC (in bits)
@@ -166,40 +172,12 @@ namespace Phase2Tracker
     }
     // starting byte for CBC status bits
     std::vector<uint8_t> cbc_status;
-    if (status_size==8)
+    while(cbc_num>0)
     {
-      int num_bytes    = cbc_num;
-      int current_byte = 5;
-      while(num_bytes>0)
-      {
-        cbc_status.push_back(static_cast<uint8_t>((data64>>current_byte*8)&0xFF));
-        if(current_byte==0)
-        {
-          current_byte = 8;
-          offset += 8;
-          data64 = read64(offset,trackerHeader_);
-        }
-        current_byte--;
-        num_bytes--;
-      }
+        cbc_status.push_back(static_cast<uint8_t>(read_n_at_m(trackerHeader_,status_size,offset_bits)));
+        cbc_num--;
+        offset_bits += status_size;
     }
-    else if (status_size==1)
-    {
-      int current_bit  = 47;
-      int num_bits = cbc_num;
-      while(num_bits>0)
-      {
-        cbc_status.push_back(static_cast<uint8_t>((data64>>current_bit)&0x1));
-        if(current_bit==0) {
-          current_bit = 64;
-          offset += 8;
-          data64 = read64(offset,trackerHeader_);
-        }
-        current_bit--;
-        num_bits--;
-      }
-    }
-
     return cbc_status;
   }
   
@@ -207,7 +185,7 @@ namespace Phase2Tracker
   {
     int status_size = 0;
     int cbc_num = numberOfCBC();
-    // CAUTION: we express all sizes in bits here
+    // all sizes in bits here
     if (debugMode_==FULL_DEBUG)
     {
       status_size = 8;
@@ -217,7 +195,7 @@ namespace Phase2Tracker
       status_size = 1;
     }
     // compute number of additional 64 bit words before payload
-    int num_add_words64 = (cbc_num * status_size - 48 + 64 - 1) / 64 ;
+    int num_add_words64 = (cbc_num * status_size + 64 - 1) / 64 ;
     // back to bytes
     trackerHeaderSize_ = (2 + num_add_words64) * 8;
     return &trackerHeader_[trackerHeaderSize_];
