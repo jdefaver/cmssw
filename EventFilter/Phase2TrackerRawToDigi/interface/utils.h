@@ -185,7 +185,7 @@ namespace Phase2Tracker {
 
 
 
-  //enum values to parse tracker header
+  // tracker header masks
   enum trackerHeader_m { VERSION_M       = 0xF000000000000000,
                          HEADER_FORMAT_M = 0x0C00000000000000,
                          EVENT_TYPE_M    = 0x03C0000000000000,
@@ -194,14 +194,23 @@ namespace Phase2Tracker {
                          CBC_NUMBER_M    = 0xFFFF000000000000 
                        };
 
+  // position of first bit
   enum trackerHeader_s { VERSION_S       = 60,
                          HEADER_FORMAT_S = 58,
                          EVENT_TYPE_S    = 54,
-                         GLIB_STATUS_S   = 16,
-                         FRONTEND_STAT_S = 0,
-                         CBC_NUMBER_S    = 48
+                         GLIB_STATUS_S   = 24,
+                         CBC_NUMBER_S    = 8,
+                         FRONTEND_STAT_S = 0
                        };
 
+  // number of bits (replaces mask)
+  enum trackerheader_l { VERSION_L       = 4,
+                         HEADER_FORMAT_L = 2,
+                         EVENT_TYPE_L    = 4,
+                         GLIB_STATUS_L   = 30,
+                         CBC_NUMBER_L    = 16,
+                         FRONTEND_STAT_L = 0
+                       };
 
   // get 64 bits word from data with given offset : only use if at beginning of 64 bits word 
   inline uint64_t read64(int offset, const uint8_t* buffer)
