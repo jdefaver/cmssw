@@ -100,12 +100,12 @@ namespace Phase2Tracker
         {
           // Read FE header : 
           // FE header is : P/S (1bit) + #P clusters (5bits if P, 0 otherwise) + #S clusters (5bits)
-          // read type of module (S/P)
+          // read type of module (2S/PS)
           uint8_t mod_type = static_cast<uint8_t>(read_n_at_m(payloadPointer_,1,bitOffset));
           // note the index of the next channel to fill
           int ichan = channels_.size();
-          // add the proper number of channels for this FE (=MAX_CBC_PER_FE)
-          channels_.insert(channels_.end(),size_t(MAX_CBC_PER_FE),Phase2TrackerFEDChannel(payloadPointer_,0,0));
+          // add the proper number of channels for this FE (2 channels per chip because of PS) 
+          channels_.insert(channels_.end(),size_t(MAX_CBC_PER_FE*2),Phase2TrackerFEDChannel(payloadPointer_,0,0));
           // read number of clusters of each type
           uint8_t num_p, num_s;
           if (mod_type == 0)
@@ -126,14 +126,14 @@ namespace Phase2Tracker
           int chanSize = 0;
           for (int i=0; i<num_p; i++)
           {
-              // test if new CBC
+              // test if new chip (CBC for 2S, ??? for PS)
               iCBC = static_cast<uint8_t>(read_n_at_m(payloadPointer_,4,bitOffset));
               if(iCBC != currCBC)
               {
                   if(iCBC > 0) 
                   {
-                      // save channel
-                      channels_[ichan + iCBC] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8);
+                      // save channel (P channels start after S channels)
+                      channels_[ichan + iCBC + MAX_CBC_PER_FE] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,MODULE_PS);
                       // advance bit pointer
                       bitOffset += chanSize;
                   }
@@ -145,6 +145,7 @@ namespace Phase2Tracker
                   chanSize += P_CLUSTER_SIZE_BITS;
               }
           }
+          currCBC = -1;
           for (int i=0; i<num_s; i++)
           {
               iCBC = static_cast<uint8_t>(read_n_at_m(payloadPointer_,4,bitOffset));
@@ -153,7 +154,7 @@ namespace Phase2Tracker
                   if(iCBC > 0) 
                   {
                       // save channel
-                      channels_[ichan + iCBC] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8);
+                      channels_[ichan + iCBC] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,MODULE_2S);
                       // advance bit pointer
                       bitOffset += chanSize;
                   }
@@ -174,11 +175,6 @@ namespace Phase2Tracker
       }
       // compute byte offset for payload
       offsetBeginningOfChannel = (bitOffset + 8 -1)/8;
-    }
-    else
-    {
-      // TODO: throw exception for unrecognised readout mode
-      // check done at Phase2TrackerFEDHeader::readoutMode()
     }
     // round the offset to the next 64 bits word
     int words64 = (offsetBeginningOfChannel + 8 - 1)/8; // size in 64 bit
