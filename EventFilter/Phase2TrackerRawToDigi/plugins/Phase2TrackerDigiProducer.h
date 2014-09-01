@@ -52,8 +52,10 @@ namespace Phase2Tracker {
         size_t index;
         uint16_t length;
     };
-    std::vector<Registry> proc_work_registry_;
+    std::vector<Registry>          proc_work_registry_;
     std::vector<Phase2TrackerDigi> proc_work_digis_;
+    std::vector<Registry>          zs_work_registry_;
+    std::vector<Phase2TrackerDigi> zs_work_digis_;
   };
 }
 #endif // EventFilter_Phase2TrackerRawToDigi_Phase2TrackerDigiProducer_H

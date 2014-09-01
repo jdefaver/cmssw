@@ -133,7 +133,7 @@ namespace Phase2Tracker
                   if(iCBC > 0) 
                   {
                       // save channel (P channels start after S channels)
-                      channels_[ichan + iCBC + MAX_CBC_PER_FE] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,MODULE_PS);
+                      channels_[ichan + iCBC + MAX_CBC_PER_FE] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,DET_PonPS);
                       // advance bit pointer
                       bitOffset += chanSize;
                   }
@@ -154,7 +154,8 @@ namespace Phase2Tracker
                   if(iCBC > 0) 
                   {
                       // save channel
-                      channels_[ichan + iCBC] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,MODULE_2S);
+                      DET_TYPE det_type = (mod_type == 0) ? DET_SonPS : DET_Son2S;
+                      channels_[ichan + iCBC] = Phase2TrackerFEDChannel(payloadPointer_,bitOffset/8,(chanSize + 8 -1)/8,bitOffset%8,det_type);
                       // advance bit pointer
                       bitOffset += chanSize;
                   }

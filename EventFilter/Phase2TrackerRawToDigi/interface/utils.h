@@ -155,8 +155,9 @@ namespace Phase2Tracker {
   enum DETECTOR_TYPE
   {
       UNUSED = -1,
-      DET_S = 0,
-      DET_P = 1
+      DET_Son2S = 0,
+      DET_SonPS = 1,
+      DET_PonPS = 2
   };
 
   //to make enums printable
