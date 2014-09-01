@@ -22,6 +22,13 @@ Phase2Tracker::Phase2TrackerCommissioningDigiProducer::~Phase2TrackerCommissioni
 {
 }
 
+void Phase2TrackerCommissioningDigiProducer::beginRun( edm::Run const& run, edm::EventSetup const& es)
+{
+  edm::ESHandle<Phase2TrackerCabling> c;
+  es.get<Phase2TrackerCablingRcd>().get( c );
+  cabling_ = c.product();
+}
+
 void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event& event, const edm::EventSetup& es)
 {
   // Retrieve FEDRawData collection
@@ -39,6 +46,10 @@ void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event&
       Phase2Tracker:: Phase2TrackerFEDBuffer* buffer = 0;
       buffer = new Phase2Tracker::Phase2TrackerFEDBuffer(fed.data(),fed.size());
 
+      // get detid from cabling
+      const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(fedIndex, ife));
+      uint32_t detid = mod.getDetid();
+
       // fetch condition data
       std::map<uint32_t,uint32_t> cond_data = buffer->conditionData();
       delete buffer;
@@ -54,7 +65,7 @@ void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event&
       }
       LogTrace("Phase2TrackerCommissioningDigiProducer") << "----------------------------" << std::endl;
       // store it into digis
-      edm::DetSet<Phase2TrackerCommissioningDigi> *cond_data_digi = new edm::DetSet<Phase2TrackerCommissioningDigi>(fedIndex);
+      edm::DetSet<Phase2TrackerCommissioningDigi> *cond_data_digi = new edm::DetSet<Phase2TrackerCommissioningDigi>(detid);
       for(it = cond_data.begin(); it != cond_data.end(); it++)
       {
         cond_data_digi->push_back(Phase2TrackerCommissioningDigi(it->first,it->second));

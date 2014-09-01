@@ -23,6 +23,7 @@ namespace Phase2Tracker {
     
   private:
     edm::EDGetTokenT<FEDRawDataCollection> token_;
+    const Phase2TrackerCabling * cabling_;
   };
 }
 #endif // EventFilter_Phase2TrackerRawToDigi_Phase2TrackerCommissioningDigiProducer_H

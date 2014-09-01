@@ -39,9 +39,7 @@ class Phase2TrackerHeaderProducer : public edm::EDProducer {
 
    private:
       edm::EDGetTokenT<FEDRawDataCollection> token_;
-      virtual void beginJob() override;
-      virtual void produce(edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
+      const Phase2TrackerCabling * cabling_;
 };
 
 Phase2TrackerHeaderProducer::Phase2TrackerHeaderProducer(const edm::ParameterSet& iConfig)
@@ -51,6 +49,13 @@ Phase2TrackerHeaderProducer::Phase2TrackerHeaderProducer(const edm::ParameterSet
 }
 
 Phase2TrackerHeaderProducer::~Phase2TrackerHeaderProducer() {}
+
+void Phase2TrackerHeaderProducer::beginRun( edm::Run const& run, edm::EventSetup const& es)
+{
+  edm::ESHandle<Phase2TrackerCabling> c;
+  es.get<Phase2TrackerCablingRcd>().get( c );
+  cabling_ = c.product();
+}
 
 void Phase2TrackerHeaderProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -66,8 +71,11 @@ void Phase2TrackerHeaderProducer::produce(edm::Event& iEvent, const edm::EventSe
        // construct buffer
        Phase2Tracker:: Phase2TrackerFEDBuffer * buffer = new Phase2Tracker::Phase2TrackerFEDBuffer(fed.data(),fed.size());
        Phase2TrackerHeaderDigi head_digi = Phase2TrackerHeaderDigi(buffer->trackerHeader());
+       // get detid from cabling
+       const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(fedIndex, ife));
+       uint32_t detid = mod.getDetid();
        // store digis
-       edm::DetSet<Phase2TrackerHeaderDigi> *header_digi = new edm::DetSet<Phase2TrackerHeaderDigi>(fedIndex);
+       edm::DetSet<Phase2TrackerHeaderDigi> *header_digi = new edm::DetSet<Phase2TrackerHeaderDigi>(detid);
        header_digi->push_back(header_digi);
        std::auto_ptr< edm::DetSet<Phase2TrackerHeaderDigi> > hdd(header_digi);
        event.put( hdd, "TrackerHeader" );
