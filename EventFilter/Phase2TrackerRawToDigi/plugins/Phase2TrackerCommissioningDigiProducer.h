@@ -15,15 +15,12 @@ namespace Phase2Tracker {
   class Phase2TrackerCommissioningDigiProducer : public edm::EDProducer
   {
   public:
-    /// constructor
     Phase2TrackerCommissioningDigiProducer( const edm::ParameterSet& pset );
-    /// default constructor
     ~Phase2TrackerCommissioningDigiProducer();
     void produce( edm::Event& event, const edm::EventSetup& es );
     
   private:
     edm::EDGetTokenT<FEDRawDataCollection> token_;
-    const Phase2TrackerCabling * cabling_;
   };
 }
 #endif // EventFilter_Phase2TrackerRawToDigi_Phase2TrackerCommissioningDigiProducer_H

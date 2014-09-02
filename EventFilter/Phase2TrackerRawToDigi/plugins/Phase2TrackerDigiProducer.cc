@@ -22,6 +22,8 @@ using namespace std;
 
 namespace Phase2Tracker {
 
+  typedef Phase2TrackerDigi DummyClusterDigi;
+
   Phase2TrackerDigiProducer::Phase2TrackerDigiProducer( const edm::ParameterSet& pset ) :
     runNumber_(0),
     cabling_(0),
@@ -250,7 +252,7 @@ namespace Phase2Tracker {
                 std::vector<DummyClusterDigi> clustersTop;
                 std::vector<DummyClusterDigi> clustersBottom;
                 // create appropriate unpacker
-                int side = (icbc<=7) ? 0 : 1;
+                // int side = (icbc<=7) ? 0 : 1;
                 if (channel.dettype() == DET_Son2S) 
                 {
                   Phase2TrackerFEDZSSChannelUnpacker unpacker = Phase2TrackerFEDZSSChannelUnpacker(channel);
@@ -261,11 +263,13 @@ namespace Phase2Tracker {
                     #endif
                     if (unpacker.clusterIndex()%2) 
                     {
-		      clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),side));
+		      // clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),side));
+		      clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize()));
                     }
                     else 
                     {
-                      clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),side));
+                      // clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),side));
+                      clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize()));
                     }
                     unpacker++;
                   }
@@ -278,7 +282,8 @@ namespace Phase2Tracker {
                     #ifdef EDM_ML_DEBUG
                     ss << dec << "SonPS cluster at position: " << unpacker.clusterIndex() << " with size: " << unpacker.clusterSize() << endl;
                     #endif
-                    clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex()),unpacker.clusterSize(),side));
+                    // clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex()),unpacker.clusterSize(),side));
+                    clustersTop.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex()),unpacker.clusterSize()));
                   }
                 }
                 else if (channel.dettype() == DET_PonPS)
@@ -290,7 +295,8 @@ namespace Phase2Tracker {
                     #ifdef EDM_ML_DEBUG
                     ss << dec << "PonPS cluster at position: " << unpacker.clusterIndex() <<" , "<<  unpacker.clusterZpos() << " with size: " << clusterSize() << endl;
                     #endif
-                    clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),unpacker.clusterZpos()));
+                    // clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize(),unpacker.clusterZpos()));
+                    clustersBottom.push_back(DummyClusterDigi((int)(STRIPS_PER_CBC*icbc + unpacker.clusterIndex())/2,unpacker.clusterSize()));
                     unpacker++;
                   }
                 }
@@ -333,10 +339,10 @@ namespace Phase2Tracker {
               it = it2;
             }
 
-            edm::DetSetVector<DummyClusterDigi> zs_dsv( sorted_and_merged, true );
-            zs->swap( zs_dsv );
-            std::auto_ptr< edm::DetSetVector<Phase2TrackerDigi> > zs_dsv(zs);
-            event.put(zs_dsv, "Sparsified" );
+            edm::DetSetVector<DummyClusterDigi> sparsified_dsv( sorted_and_merged, true );
+            zs->swap( sparsified_dsv );
+            std::auto_ptr< edm::DetSetVector<DummyClusterDigi> > sp_dsv(zs);
+            event.put(sp_dsv, "Sparsified" );
             delete buffer;
           } // end loop on FE
         }

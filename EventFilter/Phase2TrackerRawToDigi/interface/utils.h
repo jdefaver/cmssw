@@ -152,7 +152,7 @@ namespace Phase2Tracker {
   };
 
   // module types
-  enum DETECTOR_TYPE
+  enum DET_TYPE
   {
       UNUSED = -1,
       DET_Son2S = 0,
