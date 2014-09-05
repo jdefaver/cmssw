@@ -28,6 +28,8 @@ namespace Phase2Tracker {
   static const int TRIGGER_SIZE = 0; 
   static const int P_CLUSTER_SIZE_BITS = 18;
   static const int S_CLUSTER_SIZE_BITS = 15;
+  static const int CBC_STATUS_SIZE_DEBUG = 10;
+  static const int CBC_STATUS_SIZE_ERROR = 2;
 
   // definition
 
@@ -244,6 +246,32 @@ namespace Phase2Tracker {
     return data;
   }
 
+  // writes data at a certain bit position. 
+  // data should be a 64 bit word, with relevant data at the beginning 
+  inline void write_n_at_m(uint8_t* buffer, int size, int pos_bit, uint64_t data)
+  {
+    // remove additional data
+    data &= ((1LL<<size)-1);
+    int iword = pos_bit/64;
+    int end_bit = pos_bit % 64 + size;
+    uint64_t curr_data = *(uint64_t*)(buffer+(iword*8));
+    // mask to keep all bits that should not be replaced
+    uint64_t mask = ~(((1LL<<size)-1)<<pos_bit);
+    curr_data &= mask;
+    // add data
+    curr_data |= (data<<pos_bit);
+    memcpy(buffer+(iword*8),&curr_data, 8);
+    if ( end_bit > 64 )
+    {
+      // there are more bits to write
+      mask = ~((1LL<<(end_bit-64))-1);
+      uint64_t data_supp = *(uint64_t*)(buffer+((iword+1)*8));
+      data_supp &= mask;
+      data_supp |= (data>>(end_bit-64));
+      memcpy(buffer+((iword+1)*8),&data_supp, 8);
+    }
+  }
+  
 } // end of Phase2Tracker namespace
 
 #endif // } end def utils
