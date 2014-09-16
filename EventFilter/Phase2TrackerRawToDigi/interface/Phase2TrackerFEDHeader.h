@@ -45,6 +45,7 @@ namespace Phase2Tracker {
       // CBC status bits, according to debug mode 
       // (empty, 1bit per CBC, 8bits per CBC)
       std::vector<uint16_t> CBCStatus() const;
+      void setCBCStatus();
 
       // get header raw data
       inline uint8_t* data() { return headercopy_; }
@@ -77,8 +78,6 @@ namespace Phase2Tracker {
       const uint8_t* trackerHeader_; // pointer to the begining of Tracker Header
       const uint8_t* pointerToData_; // pointer next to end of Tracker Header
       uint8_t trackerHeaderSize_;    // Tracker Header in bytes
-      uint64_t header_first_word_;
-      uint64_t header_second_word_;
       uint8_t  dataFormatVersion_; // shoud be 1
       READ_MODE  debugMode_;       // debug, error, sumary ...
       uint8_t  eventType_;         // contains readoutMode_, conditionData_ and dataType_
@@ -87,6 +86,7 @@ namespace Phase2Tracker {
       uint8_t dataType_;           // data fake or real
       uint64_t glibStatusCode_;    // glib status registers
       uint16_t numberOfCBC_;       // Total number of connected CBC
+      uint64_t header_first_word_;
 
   }; // end of Phase2TrackerFEDHeader class
 }

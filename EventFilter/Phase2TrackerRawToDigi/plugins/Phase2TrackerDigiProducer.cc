@@ -225,7 +225,7 @@ namespace Phase2Tracker {
           edm::DetSetVector<Phase2TrackerDigi> proc_raw_dsv( sorted_and_merged, true );
           pr->swap( proc_raw_dsv );
           std::auto_ptr< edm::DetSetVector<Phase2TrackerDigi> > pr_dsv(pr);
-          event.put( pr_dsv, "ProcessedRaw" );
+          event.put( pr_dsv, "Unsparsified" );
           delete buffer;
         }
         else if (tr_header.getReadoutMode() == READOUT_MODE_ZERO_SUPPRESSED)
