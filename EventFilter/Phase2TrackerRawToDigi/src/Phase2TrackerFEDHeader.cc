@@ -51,7 +51,7 @@ namespace Phase2Tracker
     {
       std::ostringstream ss;
       ss << "[Phase2Tracker::Phase2TrackerFEDHeader::"<<__func__<<"] ";
-      ss << "Invalid Data Format Version in Traker Header : ";
+      ss << "Invalid Data Format Version in Tracker Header : ";
       printHex(&header_first_word_,1,ss);
       throw cms::Exception("Phase2TrackerFEDBuffer") << ss.str();
     }
@@ -197,6 +197,15 @@ namespace Phase2Tracker
     {
       return 0;
     }
+  }
+
+  void setCBCStatus()
+  {
+    std::ostringstream ss;
+    ss << "[Phase2Tracker::Phase2TrackerFEDHeader::"<<__func__<<"] ";
+    ss << "CBC status cannot be set : ";
+    ss << "Custom header is currently limited to two 64bit words only ";
+    throw cms::Exception("Phase2TrackerFEDBuffer") << ss.str();
   }
   
   std::vector<uint16_t> Phase2TrackerFEDHeader::CBCStatus() const
