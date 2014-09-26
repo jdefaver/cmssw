@@ -87,6 +87,26 @@ void Phase2TrackerCabling::initializeCabling() {
   std::sort(gbtCabling_.begin(),gbtCabling_.end(),gbtidOrdering);
 }
 
+Phase2TrackerCabling::Phase2TrackerCabling( const Phase2TrackerCabling& src ) {
+  connections_ = src.connections_;
+  fedCabling_  = src.fedCabling_;
+  detCabling_  = src.detCabling_;
+  gbtCabling_  = src.gbtCabling_;
+}
+
+const Phase2TrackerCabling::cabling Phase2TrackerCabling::orderedConnections(int type) const {
+  switch (type) {
+    case 0:
+      return fedCabling_;
+    case 1:
+      return detCabling_;
+    case 2:
+      return gbtCabling_;
+    default:
+      return fedCabling_;
+  }
+}
+
 const Phase2TrackerModule& Phase2TrackerCabling::findFedCh(std::pair<unsigned int, unsigned int> fedch) const {
   // look for ch
   cabling::const_iterator itid = std::lower_bound(fedCabling_.begin(), fedCabling_.end(), fedch, chComp);
