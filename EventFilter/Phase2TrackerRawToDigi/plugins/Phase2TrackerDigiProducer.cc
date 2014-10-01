@@ -17,6 +17,8 @@
 #include <sstream>
 #include <iomanip>
 #include <ext/algorithm>
+// this is ok while we use pixel clusters , we should switch to Phase2TrackerDigi later
+#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 
 #define EDM_ML_DEBUG // remove this !
 
@@ -69,15 +71,21 @@ namespace Phase2Tracker {
     event.getByToken( token_, buffers );
 
     // Analyze strip tracker FED buffers in data
-    size_t fedIndex;
-    for( fedIndex = Phase2Tracker::FED_ID_MIN; fedIndex < Phase2Tracker::CMS_FED_ID_MAX; ++fedIndex )
+    std::vector<int> feds = cabling_->listFeds();
+    std::vector<int>::iterator fedIndex;
+    for(fedIndex = feds.begin(); fedIndex != feds.end(); ++fedIndex)
     {
-      const FEDRawData& fed = buffers->FEDData(fedIndex);
+      const FEDRawData& fed = buffers->FEDData(*fedIndex);
       if(fed.size()!=0)
       {
 	// construct buffer
 	Phase2Tracker:: Phase2TrackerFEDBuffer* buffer = 0;
 	buffer = new Phase2Tracker::Phase2TrackerFEDBuffer(fed.data(),fed.size());
+        // Skip FED if buffer is not a valid tracker FEDBuffer
+        if(buffer->isValid() == 0) 
+        { 
+          continue; 
+        }
 
         #ifdef EDM_ML_DEBUG
         std::ostringstream ss;
@@ -85,7 +93,7 @@ namespace Phase2Tracker {
 	ss << " buffer debug ------------------------------- " << endl;
 	ss << " -------------------------------------------- " << endl;
 	ss << " buffer size : " << buffer->bufferSize() << endl;
-	ss << " fed id      : " << fedIndex << endl;
+	ss << " fed id      : " << *fedIndex << endl;
 	ss << " -------------------------------------------- " << endl;
 	ss << " tracker header debug ------------------------" << endl;
 	ss << " -------------------------------------------- " << endl;
@@ -140,7 +148,7 @@ namespace Phase2Tracker {
 	      if(channel.length() > 0)
 	      {
                 // get detid from cabling
-                const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(fedIndex, ife));
+                const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(*fedIndex, ife));
                 uint32_t detid = mod.getDetid();
                 #ifdef EDM_ML_DEBUG
                 ss << dec << " id from cabling : " << detid << endl;
@@ -242,7 +250,7 @@ namespace Phase2Tracker {
               if(channel.length() > 0)
               {
                 // get fedid from cabling
-                const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(fedIndex, ife));
+                const Phase2TrackerModule mod = cabling_->findFedCh(std::make_pair(*fedIndex, ife));
                 uint32_t detid = mod.getDetid();
                 #ifdef EDM_ML_DEBUG
                 ss << dec << " id from cabling : " << detid << endl;
