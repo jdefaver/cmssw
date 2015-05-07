@@ -333,7 +333,7 @@ namespace Phase2Tracker {
     // sort and store digis
     std::sort( proc_work_registry_.begin(), proc_work_registry_.end() );
     std::vector< edm::DetSet<Phase2TrackerDigi> > sorted_and_merged;
-    // edmNew::DetSetVector<Phase2TrackerDigi>* pr = new edmNew::DetSetVector<Phase2TrackerDigi>();
+    edm::DetSetVector<Phase2TrackerDigi>* pr = new edm::DetSetVector<Phase2TrackerDigi>();
     std::vector<Registry>::iterator it = proc_work_registry_.begin(), it2 = it+1, end = proc_work_registry_.end();
     while (it < end) 
     {
@@ -351,6 +351,10 @@ namespace Phase2Tracker {
       }
       it = it2;
     }
+    edm::DetSetVector<Phase2TrackerDigi> proc_raw_dsv( sorted_and_merged, true );
+    pr->swap( proc_raw_dsv );
+    std::auto_ptr< edm::DetSetVector<Phase2TrackerDigi> > pr_dsv(pr);
+    event.put( pr_dsv, "Unsparsified" );
     event.put(clusters, "Sparsified" );
   } 
 }
