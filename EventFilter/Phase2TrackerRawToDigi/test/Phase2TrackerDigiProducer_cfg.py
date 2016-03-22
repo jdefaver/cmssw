@@ -9,7 +9,7 @@ process.MessageLogger = cms.Service("MessageLogger",
         logtrace      = cms.untracked.PSet( threshold  = cms.untracked.string('DEBUG') ),
         debugModules  = cms.untracked.vstring( 'Phase2TrackerDigiProducer', 'Phase2TrackerFEDBuffer' )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 
 # process.source = cms.Source("PoolSource",
@@ -19,8 +19,9 @@ process.source = cms.Source("NewEventStreamFileReader",
 )
 
 
-# use this to use hand-made testbeam cabling
+# use this to use dummy global cabling
 # process.load('TestbeamCabling_cfi')
+# use this to use hand-made testbeam cabling
 process.load('DummyCablingTxt_cfi')
 
 process.load('EventFilter.Phase2TrackerRawToDigi.Phase2TrackerCommissioningDigiProducer_cfi')

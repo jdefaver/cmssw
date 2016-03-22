@@ -36,7 +36,7 @@ public:
   }
 
   static PackedDigiType pixelToChannel( unsigned int row, unsigned int col) {
-    assert(row<1016);
+    assert(row<2032);
     assert(col<32);
     return row|(col<<10);
   }
