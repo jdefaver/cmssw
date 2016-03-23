@@ -20,9 +20,9 @@ process.source = cms.Source("NewEventStreamFileReader",
 
 
 # use this to use dummy global cabling
-# process.load('TestbeamCabling_cfi')
+# process.load('DummyCablingTxt_cfi')
 # use this to use hand-made testbeam cabling
-process.load('DummyCablingTxt_cfi')
+process.load('TestbeamCabling_cfi')
 
 process.load('EventFilter.Phase2TrackerRawToDigi.Phase2TrackerCommissioningDigiProducer_cfi')
 process.load('EventFilter.Phase2TrackerRawToDigi.Phase2TrackerDigiProducer_cfi')
