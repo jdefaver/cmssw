@@ -26,8 +26,9 @@ namespace Phase2Tracker {
       FEDDAQTrailer daqTrailer() const { return daqTrailer_; }
       size_t bufferSize() const { return bufferSize_; }
       Phase2TrackerFEDHeader trackerHeader() const { return trackerHeader_; }
-      const Phase2TrackerFEDChannel& channel(const uint8_t internalPhase2TrackerFEDChannelNum) const { return channels_[internalPhase2TrackerFEDChannelNum]; }
-      std::map<uint32_t,uint32_t> conditionData() const;
+      const Phase2TrackerFEDChannel& channel(const uint32_t internalPhase2TrackerFEDChannelNum) const { return channels_[internalPhase2TrackerFEDChannelNum]; }
+      std::map<uint32_t,uint32_t> conditionData();
+      int isValid() { return valid_; }
 
       //methods to get info from DAQ header from FEDDAQHeader class
       FEDDAQEventType daqEventType() const { return daqHeader_.eventType(); }
@@ -45,7 +46,7 @@ namespace Phase2Tracker {
       FEDReadoutMode readoutMode() const;
       inline const uint8_t* getPointerToPayload()  const { return trackerHeader_.getPointerToData(); }
       inline const uint8_t* getPointerToCondData() const { return condDataPointer_; }
-      inline const uint8_t* getPointerToTriggerData() const { return triggerPointer_; }
+      inline const uint16_t* getPointerToTriggerData() const { return triggerPointer_; }
 
     private:
       const uint8_t* buffer_;
@@ -56,8 +57,9 @@ namespace Phase2Tracker {
       Phase2TrackerFEDHeader trackerHeader_;
       const uint8_t* payloadPointer_;
       const uint8_t* condDataPointer_;
-      const uint8_t* triggerPointer_;
+      const uint16_t* triggerPointer_;
       void findChannels();
+      int valid_;
 
     //////////////// Deprecated or dummy implemented methods ///////////////////
     public:
