@@ -9,10 +9,11 @@
 class Phase2TrackerCabling
 {
     typedef std::vector<Phase2TrackerModule> store;
+
+  public:
     typedef std::vector<Phase2TrackerModule>::const_iterator key;
     typedef std::vector<key> cabling;
 
-  public:
     // Constructor taking FED channel connection objects as input.
     Phase2TrackerCabling( const std::vector<Phase2TrackerModule>& cons );
 
