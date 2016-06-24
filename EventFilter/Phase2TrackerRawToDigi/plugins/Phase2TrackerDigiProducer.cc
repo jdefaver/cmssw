@@ -264,6 +264,7 @@ namespace Phase2Tracker {
                 Phase2TrackerFEDZSSon2SChannelUnpacker unpacker = Phase2TrackerFEDZSSon2SChannelUnpacker(channel);
                 while (unpacker.hasData())
                 {
+                  unpacker.Merge();
                   #ifdef EDM_ML_DEBUG
                   ss << std::dec << " Son2S " << (int)unpacker.clusterX() << " " << (int)unpacker.clusterSize() << " " << (int)unpacker.chipId() << endl;
                   #endif
@@ -283,6 +284,7 @@ namespace Phase2Tracker {
                 Phase2TrackerFEDZSSonPSChannelUnpacker unpacker = Phase2TrackerFEDZSSonPSChannelUnpacker(channel);
                 while (unpacker.hasData())
                 {
+                  unpacker.Merge();
                   #ifdef EDM_ML_DEBUG
                   ss << std::dec << " SonPS " << (int)unpacker.clusterX() << " " << (int)unpacker.clusterSize() << " " << (int)unpacker.chipId() << endl;
                   #endif
@@ -295,6 +297,7 @@ namespace Phase2Tracker {
                 Phase2TrackerFEDZSPonPSChannelUnpacker unpacker = Phase2TrackerFEDZSPonPSChannelUnpacker(channel);
                 while (unpacker.hasData())
                 {
+                  unpacker.Merge();
                   #ifdef EDM_ML_DEBUG
                   ss << std::dec << " PonPS " << (int)unpacker.clusterX() << " " << (int)unpacker.clusterSize() << " " << (int)unpacker.clusterY() << " " << (int)unpacker.chipId() << endl;
                   #endif
