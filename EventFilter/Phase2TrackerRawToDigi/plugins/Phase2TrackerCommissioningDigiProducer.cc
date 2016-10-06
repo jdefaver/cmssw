@@ -12,36 +12,37 @@
 
 using namespace std;
 
-Phase2Tracker::Phase2TrackerCommissioningDigiProducer::Phase2TrackerCommissioningDigiProducer( const edm::ParameterSet& pset )
-{
-  produces< edm::DetSet<Phase2TrackerCommissioningDigi> >("ConditionData");
-  token_ = consumes<FEDRawDataCollection>(pset.getParameter<edm::InputTag>("ProductLabel"));
-}
+namespace Phase2Tracker {
 
-Phase2Tracker::Phase2TrackerCommissioningDigiProducer::~Phase2TrackerCommissioningDigiProducer()
-{
-}
+  typedef std::vector< std::vector<Phase2TrackerCommissioningDigi> > condata_map;  
 
-void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event& event, const edm::EventSetup& es)
-{
-  // Retrieve FEDRawData collection
-  edm::Handle<FEDRawDataCollection> buffers;
-  event.getByToken( token_, buffers );
-
-  // Analyze strip tracker FED buffers in data
-  size_t fedIndex;
-  for( fedIndex=0; fedIndex<Phase2Tracker::CMS_FED_ID_MAX; ++fedIndex )
+  Phase2Tracker::Phase2TrackerCommissioningDigiProducer::Phase2TrackerCommissioningDigiProducer( const edm::ParameterSet& pset )
   {
-    const FEDRawData& fed = buffers->FEDData(fedIndex);
-    if(fed.size()!=0 && fedIndex >= Phase2Tracker::FED_ID_MIN && fedIndex <= Phase2Tracker::FED_ID_MAX)
-    {
-      // construct buffer
-      Phase2Tracker:: Phase2TrackerFEDBuffer* buffer = 0;
-      buffer = new Phase2Tracker::Phase2TrackerFEDBuffer(fed.data(),fed.size());
+    produces<condata_map>("ConditionData");
+    token_ = consumes<FEDRawDataCollection>(pset.getParameter<edm::InputTag>("ProductLabel"));
+  }
+  
+  Phase2Tracker::Phase2TrackerCommissioningDigiProducer::~Phase2TrackerCommissioningDigiProducer()
+  {
+  }
+  
+  void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event& event, const edm::EventSetup& es)
+  {
+    // Retrieve FEDRawData collection
+    edm::Handle<FEDRawDataCollection> buffers;
+    event.getByToken( token_, buffers );
 
-      // fetch condition data
-      std::map<uint32_t,uint32_t> cond_data = buffer->conditionData();
-      delete buffer;
+     // fill collection
+     std::auto_ptr<condata_map> cdigis( new condata_map ); /* switch to unique_ptr in CMSSW 7 */
+
+     size_t fedIndex;
+     for( fedIndex = Phase2Tracker::FED_ID_MIN; fedIndex < Phase2Tracker::CMS_FED_ID_MAX; ++fedIndex )
+     {
+       // reading
+       const FEDRawData& fed = buffers->FEDData(fedIndex);
+       if(fed.size()==0) continue;
+       Phase2Tracker::Phase2TrackerFEDBuffer buffer(fed.data(),fed.size());
+       std::map<uint32_t,uint32_t> cond_data = buffer.conditionData();
 
       // print cond data for debug
       LogTrace("Phase2TrackerCommissioningDigiProducer") << "--- Condition data debug ---" << std::endl;
@@ -63,4 +64,4 @@ void Phase2Tracker::Phase2TrackerCommissioningDigiProducer::produce( edm::Event&
       event.put(std::move(cdd), "ConditionData");
     }
   }
-}
+} // end of Phase2Tracker namespace

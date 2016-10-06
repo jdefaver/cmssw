@@ -14,6 +14,7 @@
 #include "DataFormats/FEDRawData/interface/FEDRawDataCollection.h"
 #include "CondFormats/SiStripObjects/interface/Phase2TrackerCabling.h"
 #include "DataFormats/Phase2TrackerDigi/interface/Phase2TrackerDigi.h"
+#include "DataFormats/Phase2TrackerCluster/interface/Phase2TrackerCluster1D.h"
 #include <stdint.h>
 #include <iostream>
 #include <string>
@@ -37,6 +38,7 @@ namespace Phase2Tracker {
     unsigned int runNumber_;
     edm::EDGetTokenT<FEDRawDataCollection> token_;
     const Phase2TrackerCabling * cabling_;
+    std::map< int, std::pair<int,int> > stackMap_;
     uint32_t cacheId_;
     DetIdCollection detids_;
     class Registry {
@@ -52,8 +54,10 @@ namespace Phase2Tracker {
         size_t index;
         uint16_t length;
     };
-    std::vector<Registry> proc_work_registry_;
+    std::vector<Registry>          proc_work_registry_;
     std::vector<Phase2TrackerDigi> proc_work_digis_;
+    std::vector<Registry>          zs_work_registry_;
+    std::vector<Phase2TrackerCluster1D>    zs_work_digis_;
   };
 }
 #endif // EventFilter_Phase2TrackerRawToDigi_Phase2TrackerDigiProducer_H
