@@ -105,10 +105,11 @@ void Phase2TrackerFEDTestAnalyzer::analyze( const edm::Event& event, const edm::
       cout << endl;
       cout << " Nr CBC   : " << hex << setw(16)<< (int) tr_header.getNumberOfCBC() << endl;
       cout << " CBC stat : ";
-      for(int i=0; i<tr_header.getNumberOfCBC(); i++)
-      {
-        cout << hex << setw(2) << (int) tr_header.CBCStatus()[i] << " ";
-      }
+      // TODO: add a debug display for new debug format
+      // for(int i=0; i<tr_header.getNumberOfCBC(); i++)
+      // {
+      //   cout << hex << setw(2) << (int) tr_header.CBCStatus()[i] << " ";
+      // }
       cout << endl;
       cout << " -------------------------------------------- " << endl;
       cout << " Payload  ----------------------------------- " << endl;

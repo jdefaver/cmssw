@@ -3,12 +3,13 @@
 
 #include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDDAQHeader.h"
 #include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDDAQTrailer.h"
+#include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDFEDebug.h"
 #include <stdint.h>
 #include <vector>
 
 namespace Phase2Tracker {
 
-  // tracker headers for new CBC system
+  // tracker headers 
   class Phase2TrackerFEDHeader
   {
     public:
@@ -44,8 +45,8 @@ namespace Phase2Tracker {
 
       inline uint8_t getTrackerHeaderSize() const { return trackerHeaderSize_; }
       // CBC status bits, according to debug mode 
-      // (empty, 1bit per CBC, 8bits per CBC)
-      std::vector<uint16_t> CBCStatus() const;
+      // See dataformat for details
+      std::vector<Phase2TrackerFEDFEDebug> CBCStatus() const;
       void setCBCStatus();
 
       // get header raw data
@@ -94,6 +95,7 @@ namespace Phase2Tracker {
       uint64_t header_first_word_;
 
   }; // end of Phase2TrackerFEDHeader class
+
 }
 #endif // } end def EventFilter_Phase2TrackerRawToDigi_Phase2TrackerPhase2TrackerFEDHeader_H
 
