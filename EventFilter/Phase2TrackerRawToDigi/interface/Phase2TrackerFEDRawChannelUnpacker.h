@@ -33,7 +33,7 @@ namespace Phase2Tracker {
       currentOffset_(channel.offset()),
       currentStrip_(0),
       valuesLeft_((channel.length())*8 - STRIPS_PADDING),
-      currentWord_(channel.data()[currentOffset_^7]),
+      currentWord_(channel.data()[currentOffset_]),
       bitInWord_(0)
   {
   }
@@ -45,7 +45,7 @@ namespace Phase2Tracker {
     if (bitInWord_ > 7) {
       bitInWord_ = 0;
       currentOffset_++;
-      currentWord_ = data_[currentOffset_^7];
+      currentWord_ = data_[currentOffset_];
     }
     valuesLeft_--;
     return (*this);
