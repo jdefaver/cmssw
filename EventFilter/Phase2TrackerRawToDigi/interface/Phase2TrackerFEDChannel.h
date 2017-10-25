@@ -3,12 +3,13 @@
 
 #include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDDAQHeader.h"
 #include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDDAQTrailer.h"
-#include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDBuffer.h"
+// #include "EventFilter/Phase2TrackerRawToDigi/interface/Phase2TrackerFEDBuffer.h"
 #include "EventFilter/Phase2TrackerRawToDigi/interface/utils.h"
 #include <stdint.h>
 
 namespace Phase2Tracker {
 
+  class Phase2TrackerFEDBuffer;
   // holds information about position of a channel in the buffer
   // for use by unpacker
   class Phase2TrackerFEDChannel
