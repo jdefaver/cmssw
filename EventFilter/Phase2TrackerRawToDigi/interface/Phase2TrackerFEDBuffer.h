@@ -27,6 +27,7 @@ namespace Phase2Tracker {
       size_t bufferSize() const { return bufferSize_; }
       Phase2TrackerFEDHeader trackerHeader() const { return trackerHeader_; }
       const Phase2TrackerFEDChannel& channel(const uint32_t internalPhase2TrackerFEDChannelNum) const { return channels_[internalPhase2TrackerFEDChannelNum]; }
+      const Phase2TrackerFEDChannel& stubchannel(const uint32_t internalPhase2TrackerFEDChannelNum) const { return stub_channels_[internalPhase2TrackerFEDChannelNum]; }
       std::map<uint32_t,uint32_t> conditionData();
       int isValid() { return valid_; }
 
