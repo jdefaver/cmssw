@@ -102,7 +102,7 @@ namespace Phase2Tracker {
             while (unpacker.hasData())
             {
               #ifdef EDM_ML_DEBUG
-              LogTrace("Phase2TrackerStubProducer") << "Stub X: " << unpacker.stubX() << endl; 
+              LogTrace("Phase2TrackerStubProducer") << "Stub X: " << unpacker.stubX() << " Bend: " << int(unpacker.Bend()) << endl; 
               #endif
               festubs.push_back(Phase2TrackerStub(unpacker.stubX(),unpacker.Bend()));
               unpacker++;
@@ -114,7 +114,7 @@ namespace Phase2Tracker {
             while (unpacker.hasData())
             {
               #ifdef EDM_ML_DEBUG
-              LogTrace("Phase2TrackerStubProducer") << "Stub X: " << unpacker.stubX() << ", Stub Y: " << unpacker.stubY() << endl; 
+              LogTrace("Phase2TrackerStubProducer") << "Stub X: " << unpacker.stubX() << ", Stub Y: " << unpacker.stubY() << " Bend: " << int(unpacker.Bend()) << endl; 
               #endif
               festubs.push_back(Phase2TrackerStub(unpacker.stubX(),unpacker.Bend(),unpacker.stubY()));
               unpacker++;

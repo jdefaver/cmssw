@@ -63,8 +63,9 @@ namespace Phase2Tracker
         if(*FE_it)
         {
           // read first FEDCH_PER_FEUNIT bits to know which CBC are on
-          uint16_t cbc_status = static_cast<uint16_t>(*(payloadPointer_ + (offsetBeginningOfChannel^7))<<8); 
-          cbc_status         += static_cast<uint16_t>(*(payloadPointer_ + ((offsetBeginningOfChannel + 1)^7))); 
+          uint16_t cbc_status =  static_cast<uint32_t>(read_n_at_m_l2r(payloadPointer_,16,offsetBeginningOfChannel*8));
+          // uint16_t cbc_status = static_cast<uint16_t>(*(payloadPointer_ + (offsetBeginningOfChannel^7))<<8); 
+          // cbc_status         += static_cast<uint16_t>(*(payloadPointer_ + ((offsetBeginningOfChannel + 1)^7))); 
 
           // advance pointer by FEDCH_PER_FEUNIT bits
           offsetBeginningOfChannel += MAX_CBC_PER_FE/8;
@@ -196,7 +197,7 @@ namespace Phase2Tracker
         DET_TYPE det_type = (modtype == 0) ? DET_Son2S : DET_PonPS;
         int stub_size = (modtype == 0) ? STUBS_SIZE_2S : STUBS_SIZE_PS;
         // add channel
-        stub_channels_.push_back(Phase2TrackerFEDChannel(triggerPointer_,bitOffset/8,stub_size*nstubs,bitOffset%8,det_type));   
+        stub_channels_.push_back(Phase2TrackerFEDChannel(triggerPointer_,bitOffset/8,(stub_size*nstubs + 8 - 1)/8,bitOffset%8,det_type));   
         bitOffset += stub_size*nstubs; 
       }
       else
