@@ -217,6 +217,7 @@ namespace Phase2Tracker
     // check if condition data is supposed to be there:
     if(trackerHeader_.getConditionData())
     {
+      // FIXME: TRIGGER_SIZE should be the nivce dynamic thing above
       condDataPointer_  = payloadPointer_ + payloadSize + TRIGGER_SIZE;
       // diff must be equal to condition data size
       if (bufferDiff <= 0)
@@ -300,8 +301,8 @@ namespace Phase2Tracker
       cdata[0x0011] = 0x0001;
       cdata[0x0012] = 0x0002;
       */
-      // add trigger data
-      cdata[0x0B0000FF] = (TRIGGER_SIZE>0) ? (*triggerPointer_) : 0x00000000;
+      // add trigger data (TEST ONLY)
+      // cdata[0x0B0000FF] = (TRIGGER_SIZE>0) ? (*triggerPointer_) : 0x00000000;
       return cdata;
 
   }
