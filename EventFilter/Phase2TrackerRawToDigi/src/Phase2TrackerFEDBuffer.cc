@@ -63,8 +63,9 @@ namespace Phase2Tracker
         if(*FE_it)
         {
           // read first FEDCH_PER_FEUNIT bits to know which CBC are on
-          uint16_t cbc_status = static_cast<uint16_t>(*(payloadPointer_ + (offsetBeginningOfChannel^7))<<8); 
-          cbc_status         += static_cast<uint16_t>(*(payloadPointer_ + ((offsetBeginningOfChannel + 1)^7))); 
+          uint16_t cbc_status =  static_cast<uint32_t>(read_n_at_m_l2r(payloadPointer_,16,offsetBeginningOfChannel*8));
+          // uint16_t cbc_status = static_cast<uint16_t>(*(payloadPointer_ + (offsetBeginningOfChannel^7))<<8); 
+          // cbc_status         += static_cast<uint16_t>(*(payloadPointer_ + ((offsetBeginningOfChannel + 1)^7))); 
 
           // advance pointer by FEDCH_PER_FEUNIT bits
           offsetBeginningOfChannel += MAX_CBC_PER_FE/8;
@@ -196,7 +197,7 @@ namespace Phase2Tracker
         DET_TYPE det_type = (modtype == 0) ? DET_Son2S : DET_PonPS;
         int stub_size = (modtype == 0) ? STUBS_SIZE_2S : STUBS_SIZE_PS;
         // add channel
-        stub_channels_.push_back(Phase2TrackerFEDChannel(triggerPointer_,bitOffset/8,stub_size*nstubs,bitOffset%8,det_type));   
+        stub_channels_.push_back(Phase2TrackerFEDChannel(triggerPointer_,bitOffset/8,(stub_size*nstubs + 8 - 1)/8,bitOffset%8,det_type));   
         bitOffset += stub_size*nstubs; 
       }
       else
@@ -209,14 +210,14 @@ namespace Phase2Tracker
     int triggerSize = (((bitOffset + 8 - 1)/8 + 8 - 1)/8)*8;
 
     // get diff size in bytes:
-    // fedBufferSize - (DAQHeader+TrackHeader+PayloadSize+TriggerSize+DAQTrailer)
+    // fedBufferSize - (DAQHeader+TrackHeader+PayloadSize+triggerSize+DAQTrailer)
     int bufferDiff = bufferSize_ - 8 - trackerHeader_.getTrackerHeaderSize()
                    - payloadSize - triggerSize - 8;
 
     // check if condition data is supposed to be there:
     if(trackerHeader_.getConditionData())
     {
-      condDataPointer_  = payloadPointer_ + payloadSize + TRIGGER_SIZE;
+      condDataPointer_  = payloadPointer_ + payloadSize + triggerSize;
       // diff must be equal to condition data size
       if (bufferDiff <= 0)
       {
@@ -286,21 +287,13 @@ namespace Phase2Tracker
         if(cdata.size()!=size) {
           std::ostringstream ss;
           ss << "[Phase2Tracker::Phase2TrackerFEDBuffer::"<<__func__<<"] " << "\n";
-          ss << "WARNING: Skipping FED buffer: " << "\n";
-          ss << "Cause: Number of condition data does not match the announced value!"<< "\n";
+          ss << "Number of condition data does not match the announced value"<< "\n";
           ss << "Expected condition data Size " << size << " entries" << "\n";
           ss << "Computed condition data Size " << cdata.size() << " entries" << "\n";
-					LogTrace("Phase2TrackerFEDBuffer") << ss.str() << std::endl;
+          LogTrace("Phase2TrackerFEDBuffer") << ss.str() << std::endl;
           valid_ = 0;
         }
       }
-      // DEBUG ONLY : inject fake cond data for tests
-      /*
-      cdata[0x0011] = 0x0001;
-      cdata[0x0012] = 0x0002;
-      */
-      // add trigger data
-      cdata[0x0B0000FF] = (TRIGGER_SIZE>0) ? (*triggerPointer_) : 0x00000000;
       return cdata;
 
   }
